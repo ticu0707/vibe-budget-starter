@@ -21,11 +21,11 @@ export default {
   // Unde se salvează fișierele de migrare (SQL-ul generat automat)
   out: "./drizzle",
 
-  // Ce tip de bază de date folosim (PostgreSQL prin Supabase)
-  dialect: "postgresql",
+  // Ce tip de bază de date folosim (SQLite în cazul nostru)
+  dialect: "sqlite",
 
-  // Conexiunea la baza de date Supabase
+  // Conexiunea la baza de date
   dbCredentials: {
-    url: process.env.DATABASE_URL!,
+    url: "vibe-budget.db", // Fișierul bazei de date
   },
 } satisfies Config;

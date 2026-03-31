@@ -1,5 +1,5 @@
 /**
- * HOME PAGE - VIBE BUDGET STARTER
+ * 🏠 HOME PAGE - VIBE BUDGET STARTER
  *
  * Aceasta este pagina de start a aplicației Vibe Budget.
  * În timpul cursului vom construi împreună:
@@ -13,33 +13,18 @@
 
 export default function Home() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-teal-50 to-orange-50">
+    <div className="min-h-screen bg-gradient-to-br from-teal-50 to-orange-50  ">
       <div className="container mx-auto px-4 py-16">
         <div className="max-w-3xl mx-auto text-center">
-          <h1 className="text-5xl font-bold text-gray-900 mb-6">
+          <h1 className="text-5xl font-bold text-gray-900  mb-6">
             💰 Vibe Budget
           </h1>
-          <p className="text-xl text-gray-600 mb-8">
+          <p className="text-xl text-gray-600  mb-8">
             Aplicație de gestiune financiară personală
           </p>
 
-          <div className="flex gap-4 justify-center mb-10">
-            <a
-              href="/register"
-              className="px-8 py-4 bg-teal-500 hover:bg-teal-600 text-white font-semibold rounded-full transition-all duration-300 hover:scale-105"
-            >
-              Înregistrează-te
-            </a>
-            <a
-              href="/login"
-              className="px-8 py-4 bg-orange-500 hover:bg-orange-600 text-white font-semibold rounded-full transition-all duration-300 hover:scale-105"
-            >
-              Login
-            </a>
-          </div>
-
-          <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-8 shadow-lg">
-            <h2 className="text-2xl font-semibold mb-4 text-gray-900">
+          <div className="bg-white/80  backdrop-blur-sm rounded-2xl p-8 shadow-lg">
+            <h2 className="text-2xl font-semibold mb-4 text-gray-900 ">
               🚀 Ce vom construi în Săptămânile 4-5
             </h2>
 
@@ -47,47 +32,47 @@ export default function Home() {
               <div className="flex items-start gap-3">
                 <span className="text-2xl">📊</span>
                 <div>
-                  <h3 className="font-semibold text-gray-900">Dashboard interactiv</h3>
-                  <p className="text-gray-600">Rezumat financiar cu grafice și statistici</p>
+                  <h3 className="font-semibold text-gray-900 ">Dashboard interactiv</h3>
+                  <p className="text-gray-600 ">Rezumat financiar cu grafice și statistici</p>
                 </div>
               </div>
 
               <div className="flex items-start gap-3">
                 <span className="text-2xl">🏦</span>
                 <div>
-                  <h3 className="font-semibold text-gray-900">Multi-bank support</h3>
-                  <p className="text-gray-600">Gestionează conturi de la mai multe bănci</p>
+                  <h3 className="font-semibold text-gray-900 ">Multi-bank support</h3>
+                  <p className="text-gray-600 ">Gestionează conturi de la mai multe bănci</p>
                 </div>
               </div>
 
               <div className="flex items-start gap-3">
                 <span className="text-2xl">📁</span>
                 <div>
-                  <h3 className="font-semibold text-gray-900">Upload CSV/Excel</h3>
-                  <p className="text-gray-600">Import automat extrase bancare (Revolut, ING, BT)</p>
+                  <h3 className="font-semibold text-gray-900 ">Upload CSV/Excel</h3>
+                  <p className="text-gray-600 ">Import automat extrase bancare (Revolut, ING, BT)</p>
                 </div>
               </div>
 
               <div className="flex items-start gap-3">
                 <span className="text-2xl">🤖</span>
                 <div>
-                  <h3 className="font-semibold text-gray-900">AI Financial Coach</h3>
-                  <p className="text-gray-600">Recomandări personalizate cu Claude AI</p>
+                  <h3 className="font-semibold text-gray-900 ">AI Financial Coach</h3>
+                  <p className="text-gray-600 ">Recomandări personalizate cu Claude AI</p>
                 </div>
               </div>
             </div>
 
-            <div className="mt-8 p-4 bg-teal-50 rounded-lg">
-              <p className="text-sm text-gray-700">
+            <div className="mt-8 p-4 bg-teal-50  rounded-lg">
+              <p className="text-sm text-gray-700 ">
                 <strong>📚 Starter Kit Include:</strong> Next.js setup complet, Drizzle ORM schema,
                 Supabase config, Tailwind styling, și structura folderelor pregătită.
               </p>
             </div>
           </div>
 
-          <p className="mt-8 text-gray-500">
-            Începe cu <span className="font-mono bg-gray-100 px-2 py-1 rounded">npm install</span> apoi
-            <span className="font-mono bg-gray-100 px-2 py-1 rounded ml-2">npm run dev</span>
+          <p className="mt-8 text-gray-500 ">
+            Începe cu <span className="font-mono bg-gray-100  px-2 py-1 rounded">npm install</span> apoi
+            <span className="font-mono bg-gray-100  px-2 py-1 rounded ml-2">npm run dev</span>
           </p>
         </div>
       </div>
