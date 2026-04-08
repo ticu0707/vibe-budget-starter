@@ -6,6 +6,7 @@ import LogoutButton from "./LogoutButton";
 const navItems = [
   { href: "/dashboard", label: "Dashboard", icon: "📊" },
   { href: "/dashboard/transactions", label: "Tranzacții", icon: "💳" },
+  { href: "/dashboard/reports", label: "Rapoarte", icon: "📈" },
   { href: "/dashboard/categories", label: "Categorii", icon: "📁" },
   { href: "/dashboard/banks", label: "Bănci", icon: "🏦" },
   { href: "/dashboard/currencies", label: "Valute", icon: "💱" },
