@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
+import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import type { Transaction, Bank, Category, Currency } from "@/lib/db/schema";
 
@@ -71,6 +72,8 @@ export default function TransactionsClient({
   const [form, setForm] = useState<FormState>(emptyForm());
   const [saving, setSaving] = useState(false);
   const [originalCategoryId, setOriginalCategoryId] = useState<string | null>(null);
+  const [autoCategorizing, setAutoCategorizing] = useState(false);
+  const router = useRouter();
 
   const hasFilters = Object.values(filters).some((v) => v !== "");
 
@@ -108,6 +111,25 @@ export default function TransactionsClient({
 
   const resetFilters = () => {
     setFilters({ search: "", type: "", bankId: "", categoryId: "", currency: "", dateFrom: "", dateTo: "" });
+  };
+
+  const handleAutoCategorize = async () => {
+    if (!window.confirm("Categorizează automat toate tranzacțiile fără categorie?")) return;
+    setAutoCategorizing(true);
+    try {
+      const res = await fetch("/api/transactions/auto-categorize", { method: "POST" });
+      const data = await res.json();
+      if (res.ok) {
+        toast.success(data.message ?? `${data.updated} tranzacții categorizate`);
+        router.refresh(); // reîncarcă props din server (categories + transactions)
+      } else {
+        toast.error(data.error ?? "Eroare la auto-categorizare");
+      }
+    } catch {
+      toast.error("Eroare de rețea");
+    } finally {
+      setAutoCategorizing(false);
+    }
   };
 
   const openAdd = () => {
@@ -237,12 +259,21 @@ export default function TransactionsClient({
             {transactions.length} tranzacții{hasFilters ? " (filtrate)" : ""}
           </p>
         </div>
-        <button
-          onClick={openAdd}
-          className="bg-orange-500 hover:bg-orange-600 text-white font-semibold rounded-xl px-5 py-2.5 transition-colors"
-        >
-          + Adaugă tranzacție
-        </button>
+        <div className="flex gap-3">
+          <button
+            onClick={handleAutoCategorize}
+            disabled={autoCategorizing}
+            className="bg-teal-500 hover:bg-teal-600 disabled:opacity-50 text-white font-semibold rounded-xl px-5 py-2.5 transition-colors"
+          >
+            {autoCategorizing ? "Se procesează..." : "🤖 Auto-categorizează"}
+          </button>
+          <button
+            onClick={openAdd}
+            className="bg-orange-500 hover:bg-orange-600 text-white font-semibold rounded-xl px-5 py-2.5 transition-colors"
+          >
+            + Adaugă tranzacție
+          </button>
+        </div>
       </div>
 
       {/* Filtre */}
