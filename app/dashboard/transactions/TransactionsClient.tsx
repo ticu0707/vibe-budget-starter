@@ -70,6 +70,7 @@ export default function TransactionsClient({
   const [editingId, setEditingId] = useState<string | null>(null);
   const [form, setForm] = useState<FormState>(emptyForm());
   const [saving, setSaving] = useState(false);
+  const [originalCategoryId, setOriginalCategoryId] = useState<string | null>(null);
 
   const hasFilters = Object.values(filters).some((v) => v !== "");
 
@@ -117,6 +118,7 @@ export default function TransactionsClient({
 
   const openEdit = (t: Transaction) => {
     setEditingId(t.id);
+    setOriginalCategoryId(t.categoryId ?? null);
     setForm({
       date: t.date,
       description: t.description,
@@ -156,6 +158,26 @@ export default function TransactionsClient({
         return;
       }
 
+      // Salvare automată keyword dacă s-a atribuit o categorie nouă
+      const categoryChanged = form.categoryId && form.categoryId !== originalCategoryId;
+      if (categoryChanged) {
+        const keyword = extractKeyword(form.description);
+        if (keyword) {
+          const kwRes = await fetch("/api/keywords", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ keyword, categoryId: form.categoryId }),
+          });
+          if (kwRes.ok) {
+            const kwData = await kwRes.json();
+            if (kwData.saved) {
+              const catName = categories.find((c) => c.id === form.categoryId)?.name ?? "";
+              toast.success(`Keyword "${keyword}" salvat → ${catName}`);
+            }
+          }
+        }
+      }
+
       toast.success(editingId ? "Tranzacție actualizată!" : "Tranzacție adăugată!");
       setShowModal(false);
       await fetchTransactions(filters);
@@ -165,6 +187,25 @@ export default function TransactionsClient({
       setSaving(false);
     }
   };
+
+  function extractKeyword(description: string): string | null {
+    // Elimină prefixele comune din extrasele bancare românești
+    let cleaned = description
+      .replace(/^Card:\d+\s+[X\d ]+\s+/i, "")        // "Card:4243 XXXX XXXX 7559 "
+      .replace(/^POS comerciant\s+[\d.,]+\s+\w+\s+[\d-]+\s+/i, "") // "POS comerciant 36.47 RON 21-02-2026 "
+      .replace(/^MOBILE-/i, "")
+      .replace(/^Plata\s+/i, "")
+      .replace(/^Retragere\s+numerar\s+ATM\s+/i, "ATM ")
+      .replace(/Curs\*.*$/i, "")                       // elimină "Curs* calculat:..."
+      .replace(/IBAN\s+Platitor:.*/i, "")               // elimină IBAN info
+      .replace(/Platitor:.*/i, "")
+      .trim();
+
+    // Ia primul cuvânt util (min 3 caractere, nu doar cifre)
+    const words = cleaned.split(/[\s,./\\|]+/);
+    const keyword = words.find((w) => w.length >= 3 && !/^\d+$/.test(w));
+    return keyword ? keyword.toLowerCase() : null;
+  }
 
   const handleDelete = async (t: Transaction) => {
     if (!window.confirm(`Ștergi tranzacția "${t.description}"?`)) return;
