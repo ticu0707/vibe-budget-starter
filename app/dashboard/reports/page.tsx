@@ -24,7 +24,7 @@ export default async function ReportsPage() {
   const dateFrom = format(startOfMonth(new Date()), "yyyy-MM-dd");
   const dateCondition = gte(schema.transactions.date, dateFrom);
 
-  const [categoryRows, monthRows, incomeRows] = await Promise.all([
+  const [categoryRows, monthRows, incomeRows, incomeMonthRows] = await Promise.all([
     db
       .select({
         categoryId: schema.transactions.categoryId,
@@ -52,10 +52,29 @@ export default async function ReportsPage() {
       .select({ total: sql<number>`COALESCE(SUM(${schema.transactions.amount}), 0)` })
       .from(schema.transactions)
       .where(and(eq(schema.transactions.userId, user.id), gt(schema.transactions.amount, 0), dateCondition)),
+
+    db
+      .select({
+        month: sql<string>`TO_CHAR(DATE_TRUNC('month', ${schema.transactions.date}::date), 'YYYY-MM')`,
+        total: sql<number>`SUM(${schema.transactions.amount})`,
+      })
+      .from(schema.transactions)
+      .where(and(eq(schema.transactions.userId, user.id), gt(schema.transactions.amount, 0), dateCondition))
+      .groupBy(sql`DATE_TRUNC('month', ${schema.transactions.date}::date)`)
+      .orderBy(sql`DATE_TRUNC('month', ${schema.transactions.date}::date)`),
   ]);
 
   const totalExpense = categoryRows.reduce((sum, r) => sum + Number(r.total), 0);
   const totalIncome = Number(incomeRows[0]?.total ?? 0);
+
+  const incomeByMonth = new Map(incomeMonthRows.map((r) => [r.month, Number(r.total)]));
+  const expenseByMonth = new Map(monthRows.map((r) => [r.month, Number(r.total)]));
+  const allMonths = Array.from(new Set([...incomeByMonth.keys(), ...expenseByMonth.keys()])).sort();
+  const monthlyPivot = allMonths.map((month) => {
+    const expense = expenseByMonth.get(month) ?? 0;
+    const income = incomeByMonth.get(month) ?? 0;
+    return { month, label: monthLabel(month), year: month.slice(0, 4), expense, income, balance: income - expense };
+  });
 
   const initialData = {
     expensesByCategory: categoryRows.map((r) => ({
@@ -70,6 +89,7 @@ export default async function ReportsPage() {
       label: monthLabel(r.month),
       total: Number(r.total),
     })),
+    monthlyPivot,
     summary: { totalExpense, totalIncome },
   };
 

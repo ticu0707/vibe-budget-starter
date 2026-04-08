@@ -44,7 +44,7 @@ export async function GET(request: NextRequest) {
       ? gte(schema.transactions.date, dateFrom)
       : undefined;
 
-    const [categoryRows, monthRows, incomeRows] = await Promise.all([
+    const [categoryRows, monthRows, incomeRows, incomeMonthRows] = await Promise.all([
       // Query A: cheltuieli grupate pe categorie
       db
         .select({
@@ -102,10 +102,44 @@ export async function GET(request: NextRequest) {
             dateCondition
           )
         ),
+
+      // Query D: venituri grupate pe lună
+      db
+        .select({
+          month: sql<string>`TO_CHAR(DATE_TRUNC('month', ${schema.transactions.date}::date), 'YYYY-MM')`,
+          total: sql<number>`SUM(${schema.transactions.amount})`,
+        })
+        .from(schema.transactions)
+        .where(
+          and(
+            eq(schema.transactions.userId, user.id),
+            gt(schema.transactions.amount, 0),
+            dateCondition
+          )
+        )
+        .groupBy(sql`DATE_TRUNC('month', ${schema.transactions.date}::date)`)
+        .orderBy(sql`DATE_TRUNC('month', ${schema.transactions.date}::date)`),
     ]);
 
     const totalExpense = categoryRows.reduce((sum, r) => sum + Number(r.total), 0);
     const totalIncome = Number(incomeRows[0]?.total ?? 0);
+
+    // Construiește pivot lunar (cheltuieli + venituri per lună)
+    const incomeByMonth = new Map(incomeMonthRows.map((r) => [r.month, Number(r.total)]));
+    const expenseByMonth = new Map(monthRows.map((r) => [r.month, Number(r.total)]));
+    const allMonths = Array.from(new Set([...incomeByMonth.keys(), ...expenseByMonth.keys()])).sort();
+    const monthlyPivot = allMonths.map((month) => {
+      const expense = expenseByMonth.get(month) ?? 0;
+      const income = incomeByMonth.get(month) ?? 0;
+      return {
+        month,
+        label: monthLabel(month),
+        year: month.slice(0, 4),
+        expense,
+        income,
+        balance: income - expense,
+      };
+    });
 
     const expensesByCategory = categoryRows.map((r) => ({
       categoryId: r.categoryId ?? null,
@@ -124,6 +158,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({
       expensesByCategory,
       expensesByMonth,
+      monthlyPivot,
       summary: { totalExpense, totalIncome },
     });
   } catch (error) {

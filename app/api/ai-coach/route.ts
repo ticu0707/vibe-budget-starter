@@ -137,7 +137,8 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(coachData);
   } catch (error) {
-    console.error("[AI-COACH] Error:", error);
-    return NextResponse.json({ error: "Eroare internă server" }, { status: 500 });
+    const msg = error instanceof Error ? error.message : String(error);
+    console.error("[AI-COACH] Error:", msg);
+    return NextResponse.json({ error: msg }, { status: 500 });
   }
 }
