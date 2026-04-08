@@ -73,6 +73,9 @@ export default function TransactionsClient({
   const [saving, setSaving] = useState(false);
   const [originalCategoryId, setOriginalCategoryId] = useState<string | null>(null);
   const [autoCategorizing, setAutoCategorizing] = useState(false);
+  const [quickCatOpen, setQuickCatOpen] = useState<string | null>(null);
+  const [recentlyCategorized, setRecentlyCategorized] = useState<Record<string, string>>({});
+  const [applyingSimilar, setApplyingSimilar] = useState<string | null>(null);
   const router = useRouter();
 
   const hasFilters = Object.values(filters).some((v) => v !== "");
@@ -129,6 +132,48 @@ export default function TransactionsClient({
       toast.error("Eroare de rețea");
     } finally {
       setAutoCategorizing(false);
+    }
+  };
+
+  const handleQuickCategorize = async (txId: string, categoryId: string) => {
+    setQuickCatOpen(null);
+    if (!categoryId) return;
+    try {
+      const res = await fetch(`/api/transactions/${txId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ categoryId }),
+      });
+      if (!res.ok) { toast.error("Eroare la salvare"); return; }
+      setTransactions((prev) => prev.map((t) => t.id === txId ? { ...t, categoryId } : t));
+      setRecentlyCategorized((prev) => ({ ...prev, [txId]: categoryId }));
+      const catName = categories.find((c) => c.id === categoryId)?.name ?? "";
+      toast.success(`Categorie setată: ${catName}`);
+    } catch {
+      toast.error("Eroare de rețea");
+    }
+  };
+
+  const handleApplySimilar = async (txId: string, description: string, categoryId: string) => {
+    setApplyingSimilar(txId);
+    try {
+      const res = await fetch("/api/transactions/apply-similar", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ description, categoryId }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        toast.success(data.message ?? `${data.updated} tranzacții actualizate`);
+        setRecentlyCategorized((prev) => { const n = { ...prev }; delete n[txId]; return n; });
+        router.refresh();
+      } else {
+        toast.error(data.error ?? "Eroare");
+      }
+    } catch {
+      toast.error("Eroare de rețea");
+    } finally {
+      setApplyingSimilar(null);
     }
   };
 
@@ -428,10 +473,47 @@ export default function TransactionsClient({
                           )}
                         </td>
                         <td className="py-3 text-sm text-gray-600">
-                          {category ? (
-                            <span>{category.icon} {category.name}</span>
+                          {quickCatOpen === t.id ? (
+                            <select
+                              autoFocus
+                              defaultValue={t.categoryId ?? ""}
+                              onChange={(e) => handleQuickCategorize(t.id, e.target.value)}
+                              onBlur={() => setQuickCatOpen(null)}
+                              className="text-xs border border-teal-300 rounded-lg px-2 py-1 bg-white focus:outline-none focus:ring-1 focus:ring-teal-400 max-w-[160px]"
+                            >
+                              <option value="">— Fără categorie —</option>
+                              <optgroup label="Venituri">
+                                {categories.filter((c) => c.type === "income").map((c) => (
+                                  <option key={c.id} value={c.id}>{c.icon} {c.name}</option>
+                                ))}
+                              </optgroup>
+                              <optgroup label="Cheltuieli">
+                                {categories.filter((c) => c.type === "expense").map((c) => (
+                                  <option key={c.id} value={c.id}>{c.icon} {c.name}</option>
+                                ))}
+                              </optgroup>
+                            </select>
                           ) : (
-                            <span className="text-gray-300 text-xs">—</span>
+                            <div className="flex flex-col gap-0.5">
+                              <button
+                                onClick={() => setQuickCatOpen(t.id)}
+                                className={category
+                                  ? "text-left hover:opacity-70 transition-opacity"
+                                  : "text-xs text-teal-600 hover:text-teal-700 font-medium border border-dashed border-teal-300 rounded px-2 py-0.5 hover:bg-teal-50 transition-colors"
+                                }
+                              >
+                                {category ? `${category.icon} ${category.name}` : "+ Setează"}
+                              </button>
+                              {recentlyCategorized[t.id] && (
+                                <button
+                                  onClick={() => handleApplySimilar(t.id, t.description, recentlyCategorized[t.id])}
+                                  disabled={applyingSimilar === t.id}
+                                  className="text-xs text-orange-500 hover:text-orange-600 font-medium disabled:opacity-50 transition-colors text-left"
+                                >
+                                  {applyingSimilar === t.id ? "⏳ ..." : "📋 Aplică la similare"}
+                                </button>
+                              )}
+                            </div>
                           )}
                         </td>
                         <td className="py-3 text-right">

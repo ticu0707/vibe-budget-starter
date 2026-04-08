@@ -54,6 +54,41 @@ export async function PUT(
   }
 }
 
+export async function PATCH(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  try {
+    const user = await getCurrentUser(request);
+    if (!user) {
+      return NextResponse.json({ error: "Neautentificat" }, { status: 401 });
+    }
+
+    const { id } = await params;
+    const { categoryId } = await request.json();
+
+    const [transaction] = await db
+      .update(schema.transactions)
+      .set({ categoryId: categoryId || null, updatedAt: new Date() })
+      .where(
+        and(
+          eq(schema.transactions.id, id),
+          eq(schema.transactions.userId, user.id)
+        )
+      )
+      .returning();
+
+    if (!transaction) {
+      return NextResponse.json({ error: "Tranzacție negăsită" }, { status: 404 });
+    }
+
+    return NextResponse.json({ transaction });
+  } catch (error) {
+    console.error("[TRANSACTIONS PATCH] Error:", error);
+    return NextResponse.json({ error: "Eroare internă server" }, { status: 500 });
+  }
+}
+
 export async function DELETE(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }

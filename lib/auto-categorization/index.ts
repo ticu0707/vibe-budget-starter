@@ -64,6 +64,10 @@ export const BUILTIN_RULES: Record<string, string[]> = {
     "carte", "librarie", "humanitas",
     "taxa scolara", "cursuri",
   ],
+  "Economii": [
+    "economii", "depozit", "fond urgenta", "fond de urgenta",
+    "transfer economii", "cont economii", "scop economii",
+  ],
   "Venituri": [
     "incasare salariu", "salariu", "virament salariu",
     "dividend", "freelance", "onorariu",

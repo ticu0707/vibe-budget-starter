@@ -6,7 +6,7 @@
 
 export interface SystemCategory {
   name: string;
-  type: "income" | "expense" | "transfer";
+  type: "income" | "expense";
   icon: string;
   description: string;
 }
@@ -68,6 +68,12 @@ export function getAIICategories(): SystemCategory[] {
       icon: "🏛️",
       description: "Impozite, taxe, amenzi, contribuții",
     },
+    {
+      name: "Economii",
+      type: "expense",
+      icon: "🏦",
+      description: "Depozite, fond de urgență, economii lunare",
+    },
     // ── Venituri (1) ────────────────────────────────────────────────
     {
       name: "Venituri",
@@ -78,13 +84,13 @@ export function getAIICategories(): SystemCategory[] {
     // ── Transferuri (2) ─────────────────────────────────────────────
     {
       name: "Transfer Intern",
-      type: "transfer",
+      type: "expense",
       icon: "🔄",
       description: "Transfer între conturile proprii",
     },
     {
       name: "Transferuri",
-      type: "transfer",
+      type: "expense",
       icon: "↔️",
       description: "Transferuri către/de la alte persoane",
     },
