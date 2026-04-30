@@ -95,9 +95,9 @@ export default function CurrenciesClient({ initialCurrencies }: Props) {
   };
 
   return (
-    <div className="p-8">
+    <div className="p-4 md:p-8">
       {/* Header */}
-      <div className="mb-8 flex items-center justify-between">
+      <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
         <div>
           <h2 className="text-2xl font-bold text-gray-900">Valute</h2>
           <p className="text-gray-500 mt-1">Gestionează valutele folosite</p>

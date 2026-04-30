@@ -557,33 +557,34 @@ function PredictionsTab({ initialData }: { initialData: InsightsData }) {
 export default function AIInsightsClient({ initialData }: { initialData: InsightsData }) {
   const [activeTab, setActiveTab] = useState<ActiveTab>("analysis");
 
-  const tabs: { id: ActiveTab; label: string }[] = [
-    { id: "analysis", label: "📊 Analiză AI" },
-    { id: "chat", label: "☕ Chat Barista Bot" },
-    { id: "predictions", label: "🔮 Predicții & Alerte" },
+  const tabs: { id: ActiveTab; label: string; short: string }[] = [
+    { id: "analysis", label: "📊 Analiză AI", short: "📊 Analiză" },
+    { id: "chat", label: "☕ Chat Barista Bot", short: "☕ Chat" },
+    { id: "predictions", label: "🔮 Predicții & Alerte", short: "🔮 Predicții" },
   ];
 
   return (
-    <div className="p-8 max-w-4xl mx-auto">
+    <div className="p-4 md:p-8 max-w-4xl mx-auto">
       {/* Header */}
-      <div className="mb-8">
+      <div className="mb-6">
         <h1 className="text-2xl font-bold text-gray-900">🤖 AI Insights</h1>
         <p className="text-gray-500 text-sm mt-1">Analiză financiară inteligentă bazată pe tranzacțiile tale</p>
       </div>
 
       {/* Tab Bar */}
-      <div className="flex gap-1 bg-gray-100 rounded-2xl p-1.5 mb-8">
+      <div className="flex gap-1 bg-gray-100 rounded-2xl p-1.5 mb-6">
         {tabs.map((tab) => (
           <button
             key={tab.id}
             onClick={() => setActiveTab(tab.id)}
-            className={`flex-1 px-4 py-2.5 rounded-xl text-sm font-medium transition-all ${
+            className={`flex-1 px-2 py-2.5 rounded-xl text-xs sm:text-sm font-medium transition-all ${
               activeTab === tab.id
                 ? "bg-white text-teal-700 shadow-sm font-semibold"
                 : "text-gray-500 hover:text-gray-700"
             }`}
           >
-            {tab.label}
+            <span className="hidden sm:inline">{tab.label}</span>
+            <span className="sm:hidden">{tab.short}</span>
           </button>
         ))}
       </div>

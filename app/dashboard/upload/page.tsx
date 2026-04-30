@@ -104,9 +104,9 @@ export default function UploadPage() {
   };
 
   return (
-    <div className="p-8 max-w-3xl mx-auto">
+    <div className="p-4 md:p-8 max-w-3xl mx-auto">
       {/* Header */}
-      <div className="mb-8">
+      <div className="mb-6">
         <h2 className="text-2xl font-bold text-gray-900">Upload extras bancar</h2>
         <p className="text-gray-500 mt-1">Importă tranzacții din fișier CSV sau Excel</p>
       </div>

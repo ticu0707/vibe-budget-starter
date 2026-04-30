@@ -2,6 +2,7 @@ import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import LogoutButton from "./LogoutButton";
+import MobileSidebar from "./MobileSidebar";
 
 const navItems = [
   { href: "/dashboard", label: "Dashboard", icon: "📊" },
@@ -28,8 +29,8 @@ export default async function DashboardLayout({
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-teal-50 to-orange-50 flex">
-      {/* Sidebar */}
-      <aside className="w-64 bg-white/30 backdrop-blur-md border-r border-teal-100 flex flex-col">
+      {/* Sidebar desktop - ascuns pe mobile */}
+      <aside className="hidden lg:flex w-64 bg-white/30 backdrop-blur-md border-r border-teal-100 flex-col">
         {/* Logo */}
         <div className="p-6 border-b border-teal-100">
           <h1 className="text-xl font-bold text-gray-900">💰 Vibe Budget</h1>
@@ -56,10 +57,16 @@ export default async function DashboardLayout({
         </div>
       </aside>
 
-      {/* Continut principal */}
-      <main className="flex-1 overflow-auto">
-        {children}
-      </main>
+      {/* Zona principală */}
+      <div className="flex-1 flex flex-col min-w-0">
+        {/* Mobile header + drawer */}
+        <MobileSidebar userEmail={user.email!} />
+
+        {/* Continut principal */}
+        <main className="flex-1 overflow-auto">
+          {children}
+        </main>
+      </div>
     </div>
   );
 }

@@ -54,9 +54,9 @@ export default async function DashboardPage() {
   const monthName = now.toLocaleDateString("ro-RO", { month: "long", year: "numeric" });
 
   return (
-    <div className="p-8">
+    <div className="p-4 md:p-8">
       {/* Header */}
-      <div className="mb-8 flex items-center justify-between">
+      <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
         <div>
           <h2 className="text-2xl font-bold text-gray-900">Dashboard</h2>
           <p className="text-gray-500 mt-1 capitalize">{monthName}</p>
@@ -70,7 +70,7 @@ export default async function DashboardPage() {
       </div>
 
       {/* Navigare rapidă */}
-      <div className="grid grid-cols-3 gap-4 mb-8">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
         <Link href="/dashboard/banks" className="bg-white/40 backdrop-blur-md rounded-2xl shadow border border-white/60 p-4 flex items-center gap-3 hover:bg-white/60 transition-colors">
           <span className="text-3xl">🏦</span>
           <div>

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { toast } from "sonner";
 import type { Category } from "@/lib/db/schema";
 
@@ -27,6 +27,13 @@ export default function CategoriesClient({ initialCategories }: Props) {
   const [loading, setLoading] = useState(false);
   const [showPicker, setShowPicker] = useState(false);
   const [form, setForm] = useState<FormState>({ name: "", type: "expense", icon: "📁" });
+  const formRef = useRef<HTMLDivElement>(null);
+
+  const scrollToForm = () => {
+    setTimeout(() => {
+      formRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }, 50);
+  };
 
   const income = categories.filter((c) => c.type === "income");
   const expense = categories.filter((c) => c.type === "expense");
@@ -42,6 +49,7 @@ export default function CategoriesClient({ initialCategories }: Props) {
     setForm({ name: "", type, icon: "📁" });
     setShowForm(true);
     setShowPicker(false);
+    scrollToForm();
   };
 
   const openEdit = (cat: Category) => {
@@ -49,6 +57,7 @@ export default function CategoriesClient({ initialCategories }: Props) {
     setForm({ name: cat.name, type: cat.type as "income" | "expense", icon: cat.icon || "📁" });
     setShowForm(true);
     setShowPicker(false);
+    scrollToForm();
   };
 
   const cancelForm = () => {
@@ -111,21 +120,21 @@ export default function CategoriesClient({ initialCategories }: Props) {
   };
 
   return (
-    <div className="p-8">
+    <div className="p-4 md:p-8">
       {/* Header */}
-      <div className="mb-8">
+      <div className="mb-6">
         <h2 className="text-2xl font-bold text-gray-900">Categorii</h2>
         <p className="text-gray-500 mt-1">Gestionează categoriile de tranzacții</p>
       </div>
 
       {/* Formular inline */}
       {showForm && (
-        <div className="bg-white/40 backdrop-blur-md rounded-2xl shadow-lg border border-white/60 p-6 mb-6">
+        <div ref={formRef} className="bg-white/40 backdrop-blur-md rounded-2xl shadow-lg border border-white/60 p-6 mb-6">
           <h3 className="text-lg font-semibold text-gray-900 mb-4">
             {editingId ? "Editează categorie" : `Adaugă categorie ${form.type === "income" ? "venit" : "cheltuială"}`}
           </h3>
           <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="flex gap-4">
+            <div className="flex flex-wrap gap-3">
               {/* Icon selector */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Icon</label>
@@ -139,7 +148,7 @@ export default function CategoriesClient({ initialCategories }: Props) {
               </div>
 
               {/* Nume */}
-              <div className="flex-1">
+              <div className="flex-1 min-w-[160px]">
                 <label className="block text-sm font-medium text-gray-700 mb-1">Nume categorie</label>
                 <input
                   type="text"

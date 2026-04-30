@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, Fragment } from "react";
 import {
   PieChart,
   Pie,
@@ -129,12 +129,12 @@ function PivotTable({ rows, loading }: { rows: PivotRow[]; loading: boolean }) {
   return (
     <div className="bg-white rounded-xl border border-gray-300 shadow-sm overflow-hidden">
       {/* Titlu + legendă */}
-      <div className="px-5 py-3 bg-gray-50 border-b border-gray-300 flex items-center justify-between">
+      <div className="px-5 py-3 bg-gray-50 border-b border-gray-300 flex flex-wrap items-center justify-between gap-2">
         <div className="flex items-center gap-2">
           <span>📋</span>
           <span className="font-bold text-gray-800 text-sm">Raport pivot — Dinamica financiară lunară</span>
         </div>
-        <div className="flex items-center gap-4 text-xs text-gray-500">
+        <div className="flex items-center gap-3 text-xs text-gray-500">
           <span className="flex items-center gap-1"><span className="w-3 h-3 rounded-sm bg-green-100 border border-green-400 inline-block" /> Venituri</span>
           <span className="flex items-center gap-1"><span className="w-3 h-3 rounded-sm bg-red-100 border border-red-400 inline-block" /> Cheltuieli</span>
           <span className="flex items-center gap-1"><span className="w-3 h-3 rounded-sm bg-blue-100 border border-blue-400 inline-block" /> Economii</span>
@@ -142,7 +142,7 @@ function PivotTable({ rows, loading }: { rows: PivotRow[]; loading: boolean }) {
       </div>
 
       <div className="overflow-x-auto">
-        <table className="w-full text-sm border-collapse">
+        <table className="w-full min-w-[560px] text-sm border-collapse">
           <thead>
             <tr>
               <th className="border border-gray-300 px-4 py-2.5 text-left font-bold text-gray-700 bg-gray-200 w-36">Perioadă</th>
@@ -161,9 +161,9 @@ function PivotTable({ rows, loading }: { rows: PivotRow[]; loading: boolean }) {
               const yRate = yInc > 0 ? ((yBal / yInc) * 100).toFixed(1) : "—";
 
               return (
-                <>
+                <Fragment key={year}>
                   {/* Header an */}
-                  <tr key={`yhdr-${year}`} className="bg-gray-700">
+                  <tr className="bg-gray-700">
                     <td colSpan={5} className="border border-gray-600 px-4 py-1.5 text-xs font-bold text-white uppercase tracking-widest">
                       {year}
                     </td>
@@ -239,7 +239,7 @@ function PivotTable({ rows, loading }: { rows: PivotRow[]; loading: boolean }) {
                       {yRate !== "—" ? `${yRate}%` : "—"}
                     </td>
                   </tr>
-                </>
+                </Fragment>
               );
             })}
 
@@ -364,7 +364,7 @@ export default function ReportsClient({ initialData, initialPeriod }: Props) {
   const hasData = expensesByCategory.length > 0 || expensesByMonth.length > 0;
 
   return (
-    <div className="p-8">
+    <div className="p-4 md:p-8">
       {/* Header */}
       <div className="flex flex-wrap items-center justify-between gap-4 mb-8">
         <div>
