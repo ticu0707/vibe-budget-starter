@@ -16,36 +16,32 @@ export default async function DashboardPage() {
   const lastDayDate = new Date(now.getFullYear(), now.getMonth() + 1, 0);
   const lastDay = `${lastDayDate.getFullYear()}-${String(lastDayDate.getMonth() + 1).padStart(2, "0")}-${String(lastDayDate.getDate()).padStart(2, "0")}`;
 
-  // Tranzacții luna curentă
-  const monthTransactions = await db
-    .select()
-    .from(schema.transactions)
-    .where(
-      and(
-        eq(schema.transactions.userId, user.id),
-        gte(schema.transactions.date, firstDay),
-        lte(schema.transactions.date, lastDay)
-      )
-    )
-    .orderBy(sql`${schema.transactions.date} DESC`)
-    .limit(5);
+  const monthFilter = and(
+    eq(schema.transactions.userId, user.id),
+    gte(schema.transactions.date, firstDay),
+    lte(schema.transactions.date, lastDay)
+  );
 
-  // Calcule stats
-  const allTransactions = await db
-    .select()
-    .from(schema.transactions)
-    .where(eq(schema.transactions.userId, user.id));
+  const [recentTransactions, monthStats, balanceResult] = await Promise.all([
+    db.select()
+      .from(schema.transactions)
+      .where(monthFilter)
+      .orderBy(sql`${schema.transactions.date} DESC`)
+      .limit(5),
 
-  const totalBalance = allTransactions.reduce((sum, t) => sum + Number(t.amount), 0);
+    db.select({
+      venituri: sql<number>`COALESCE(SUM(CASE WHEN ${schema.transactions.amount} > 0 THEN ${schema.transactions.amount} ELSE 0 END), 0)`,
+      cheltuieli: sql<number>`COALESCE(SUM(CASE WHEN ${schema.transactions.amount} < 0 THEN ${schema.transactions.amount} ELSE 0 END), 0)`,
+    }).from(schema.transactions).where(monthFilter),
 
-  const venituri = monthTransactions
-    .filter((t) => Number(t.amount) > 0)
-    .reduce((sum, t) => sum + Number(t.amount), 0);
+    db.select({
+      total: sql<number>`COALESCE(SUM(${schema.transactions.amount}), 0)`,
+    }).from(schema.transactions).where(eq(schema.transactions.userId, user.id)),
+  ]);
 
-  const cheltuieli = monthTransactions
-    .filter((t) => Number(t.amount) < 0)
-    .reduce((sum, t) => sum + Number(t.amount), 0);
-
+  const totalBalance = Number(balanceResult[0]?.total ?? 0);
+  const venituri = Number(monthStats[0]?.venituri ?? 0);
+  const cheltuieli = Number(monthStats[0]?.cheltuieli ?? 0);
   const economii = venituri + cheltuieli;
 
   const formatAmount = (amount: number) =>
@@ -97,25 +93,29 @@ export default async function DashboardPage() {
       {/* Stats carduri */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
         <StatCard
-          label="Total sold"
+          label="Sold acumulat"
+          subtitle="toate tranzacțiile"
           value={`${formatAmount(totalBalance)} RON`}
           icon="💰"
           color="teal"
         />
         <StatCard
-          label="Venituri luna"
+          label="Venituri"
+          subtitle={monthName}
           value={`${formatAmount(venituri)} RON`}
           icon="📈"
           color="green"
         />
         <StatCard
-          label="Cheltuieli luna"
+          label="Cheltuieli"
+          subtitle={monthName}
           value={`${formatAmount(Math.abs(cheltuieli))} RON`}
           icon="📉"
           color="red"
         />
         <StatCard
-          label="Economii luna"
+          label="Economii"
+          subtitle={monthName}
           value={`${formatAmount(economii)} RON`}
           icon="🐷"
           color="orange"
@@ -131,7 +131,7 @@ export default async function DashboardPage() {
           </Link>
         </div>
 
-        {monthTransactions.length === 0 ? (
+        {recentTransactions.length === 0 ? (
           <div className="text-center py-12 text-gray-400">
             <p className="text-4xl mb-3">📭</p>
             <p className="font-medium">Nicio tranzacție încă</p>
@@ -145,7 +145,7 @@ export default async function DashboardPage() {
           </div>
         ) : (
           <div className="space-y-2">
-            {monthTransactions.map((t) => (
+            {recentTransactions.map((t) => (
               <div
                 key={t.id}
                 className="flex items-center justify-between py-3 px-4 bg-white/50 rounded-xl"
@@ -176,11 +176,13 @@ function StatCard({
   value,
   icon,
   color,
+  subtitle,
 }: {
   label: string;
   value: string;
   icon: string;
   color: "teal" | "green" | "red" | "orange";
+  subtitle?: string;
 }) {
   const colorMap = {
     teal: "text-teal-600",
@@ -193,7 +195,10 @@ function StatCard({
     <div className="bg-white/40 backdrop-blur-md rounded-2xl shadow-lg border border-white/60 p-5">
       <div className="flex items-center gap-3 mb-2">
         <span className="text-2xl">{icon}</span>
-        <p className="text-sm text-gray-500">{label}</p>
+        <div>
+          <p className="text-sm font-medium text-gray-600">{label}</p>
+          {subtitle && <p className="text-xs text-gray-400">{subtitle}</p>}
+        </div>
       </div>
       <p className={`text-xl font-bold ${colorMap[color]}`}>{value}</p>
     </div>

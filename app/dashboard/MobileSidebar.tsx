@@ -18,9 +18,11 @@ const navItems = [
 
 interface Props {
   userEmail: string;
+  isUnlocked: boolean;
+  daysLeft: number;
 }
 
-export default function MobileSidebar({ userEmail }: Props) {
+export default function MobileSidebar({ userEmail, isUnlocked, daysLeft }: Props) {
   const [open, setOpen] = useState(false);
   const pathname = usePathname();
 
@@ -85,6 +87,23 @@ export default function MobileSidebar({ userEmail }: Props) {
             </Link>
           ))}
         </nav>
+
+        {/* Trial badge */}
+        {!isUnlocked && (
+          <div className="px-4 pb-2">
+            <div className={`rounded-xl px-3 py-2 text-xs text-center font-medium ${
+              daysLeft <= 1
+                ? "bg-red-100 text-red-700"
+                : daysLeft <= 3
+                ? "bg-orange-100 text-orange-700"
+                : "bg-teal-100 text-teal-700"
+            }`}>
+              {daysLeft <= 1
+                ? "Ultima zi de trial"
+                : `Trial: ${daysLeft} zile rămase`}
+            </div>
+          </div>
+        )}
 
         {/* Logout */}
         <div className="p-4 border-t border-teal-100">

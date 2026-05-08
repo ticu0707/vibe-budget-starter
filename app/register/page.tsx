@@ -48,7 +48,7 @@ export default function RegisterPage() {
         return;
       }
 
-      toast.success("Cont creat! Verifică emailul pentru confirmare.");
+      toast.success("Cont creat cu succes! Intră acum în cont.");
       router.push("/login");
     } catch {
       toast.error("Eroare de rețea. Încearcă din nou.");
@@ -58,21 +58,22 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-teal-50 to-orange-50 flex items-center justify-center px-4">
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-teal-950 to-slate-900 flex items-center justify-center px-4">
       <div className="w-full max-w-md">
+
         {/* Logo */}
         <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-gray-900">💰 Vibe Budget</h1>
-          <p className="text-gray-500 mt-2">Gestiunea ta financiară personală</p>
+          <h1 className="text-3xl font-bold text-white">💰 Vibe Budget</h1>
+          <p className="text-slate-400 mt-2">7 zile gratuit · Fără card</p>
         </div>
 
-        {/* Card glassmorphism */}
-        <div className="bg-white/40 backdrop-blur-md rounded-2xl shadow-lg border border-white/60 p-8">
-          <h2 className="text-2xl font-semibold text-gray-900 mb-6">Creează cont</h2>
+        {/* Card */}
+        <div className="bg-white/10 backdrop-blur-md rounded-2xl border border-white/20 p-8 shadow-2xl">
+          <h2 className="text-2xl font-semibold text-white mb-6">Creează cont</h2>
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-slate-300 mb-1">
                 Nume complet
               </label>
               <input
@@ -81,12 +82,12 @@ export default function RegisterPage() {
                 value={form.name}
                 onChange={(e) => setForm({ ...form, name: e.target.value })}
                 placeholder="Ion Popescu"
-                className="w-full bg-white/60 border border-teal-200 rounded-xl px-4 py-3 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-teal-400 focus:border-transparent"
+                className="w-full bg-white/10 border border-white/20 rounded-xl px-4 py-3 text-white placeholder-white/30 focus:outline-none focus:border-teal-400 transition-colors"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-slate-300 mb-1">
                 Email
               </label>
               <input
@@ -95,12 +96,12 @@ export default function RegisterPage() {
                 value={form.email}
                 onChange={(e) => setForm({ ...form, email: e.target.value })}
                 placeholder="email@exemplu.com"
-                className="w-full bg-white/60 border border-teal-200 rounded-xl px-4 py-3 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-teal-400 focus:border-transparent"
+                className="w-full bg-white/10 border border-white/20 rounded-xl px-4 py-3 text-white placeholder-white/30 focus:outline-none focus:border-teal-400 transition-colors"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-slate-300 mb-1">
                 Parolă
               </label>
               <input
@@ -109,12 +110,12 @@ export default function RegisterPage() {
                 value={form.password}
                 onChange={(e) => setForm({ ...form, password: e.target.value })}
                 placeholder="Minim 6 caractere"
-                className="w-full bg-white/60 border border-teal-200 rounded-xl px-4 py-3 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-teal-400 focus:border-transparent"
+                className="w-full bg-white/10 border border-white/20 rounded-xl px-4 py-3 text-white placeholder-white/30 focus:outline-none focus:border-teal-400 transition-colors"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-slate-300 mb-1">
                 Confirmă parola
               </label>
               <input
@@ -123,26 +124,27 @@ export default function RegisterPage() {
                 value={form.confirmPassword}
                 onChange={(e) => setForm({ ...form, confirmPassword: e.target.value })}
                 placeholder="••••••••"
-                className="w-full bg-white/60 border border-teal-200 rounded-xl px-4 py-3 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-teal-400 focus:border-transparent"
+                className="w-full bg-white/10 border border-white/20 rounded-xl px-4 py-3 text-white placeholder-white/30 focus:outline-none focus:border-teal-400 transition-colors"
               />
             </div>
 
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-teal-600 hover:bg-teal-700 disabled:opacity-60 text-white font-semibold rounded-xl px-6 py-3 transition-colors mt-2"
+              className="w-full py-3 bg-teal-500 hover:bg-teal-400 disabled:opacity-50 text-white font-semibold rounded-xl transition-all mt-2"
             >
-              {loading ? "Se procesează..." : "Creează cont"}
+              {loading ? "Se procesează..." : "Creează cont gratuit"}
             </button>
           </form>
 
-          <p className="text-center text-gray-500 text-sm mt-6">
+          <p className="text-center text-slate-500 text-sm mt-6">
             Ai deja cont?{" "}
-            <Link href="/login" className="text-teal-600 hover:text-teal-700 font-semibold">
+            <Link href="/login" className="text-teal-400 hover:text-teal-300 font-semibold transition-colors">
               Intră în cont
             </Link>
           </p>
         </div>
+
       </div>
     </div>
   );

@@ -1,19 +1,10 @@
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
-import Link from "next/link";
 import LogoutButton from "./LogoutButton";
 import MobileSidebar from "./MobileSidebar";
+import SidebarNav from "./SidebarNav";
 
-const navItems = [
-  { href: "/dashboard", label: "Dashboard", icon: "📊" },
-  { href: "/dashboard/transactions", label: "Tranzacții", icon: "💳" },
-  { href: "/dashboard/reports", label: "Rapoarte", icon: "📈" },
-  { href: "/dashboard/categories", label: "Categorii", icon: "📁" },
-  { href: "/dashboard/banks", label: "Bănci", icon: "🏦" },
-  { href: "/dashboard/currencies", label: "Valute", icon: "💱" },
-  { href: "/dashboard/upload", label: "Upload", icon: "📤" },
-  { href: "/dashboard/ai-insights", label: "AI Insights", icon: "🤖" },
-];
+const TRIAL_DAYS = 7;
 
 export default async function DashboardLayout({
   children,
@@ -27,6 +18,16 @@ export default async function DashboardLayout({
     redirect("/login");
   }
 
+  const daysSince = (Date.now() - new Date(user.created_at).getTime()) / (1000 * 60 * 60 * 24);
+  const isUnlocked = user.user_metadata?.unlocked === true;
+  const trialExpired = daysSince > TRIAL_DAYS && !isUnlocked;
+
+  if (trialExpired) {
+    redirect("/trial-expirat");
+  }
+
+  const daysLeft = Math.max(0, Math.ceil(TRIAL_DAYS - daysSince));
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-teal-50 to-orange-50 flex">
       {/* Sidebar desktop - ascuns pe mobile */}
@@ -38,18 +39,24 @@ export default async function DashboardLayout({
         </div>
 
         {/* Navigare */}
-        <nav className="flex-1 p-4 space-y-1">
-          {navItems.map((item) => (
-            <Link
-              key={item.href}
-              href={item.href}
-              className="flex items-center gap-3 px-4 py-3 rounded-xl text-gray-600 hover:bg-teal-100/60 hover:text-teal-800 transition-colors"
-            >
-              <span className="text-lg">{item.icon}</span>
-              <span className="font-medium">{item.label}</span>
-            </Link>
-          ))}
-        </nav>
+        <SidebarNav />
+
+        {/* Trial badge */}
+        {!isUnlocked && (
+          <div className="px-4 pb-2">
+            <div className={`rounded-xl px-3 py-2 text-xs text-center font-medium ${
+              daysLeft <= 1
+                ? "bg-red-100 text-red-700"
+                : daysLeft <= 3
+                ? "bg-orange-100 text-orange-700"
+                : "bg-teal-100 text-teal-700"
+            }`}>
+              {daysLeft <= 1
+                ? "Ultima zi de trial"
+                : `Trial: ${daysLeft} zile rămase`}
+            </div>
+          </div>
+        )}
 
         {/* Logout */}
         <div className="p-4 border-t border-teal-100">
@@ -60,7 +67,7 @@ export default async function DashboardLayout({
       {/* Zona principală */}
       <div className="flex-1 flex flex-col min-w-0">
         {/* Mobile header + drawer */}
-        <MobileSidebar userEmail={user.email!} />
+        <MobileSidebar userEmail={user.email!} isUnlocked={isUnlocked} daysLeft={daysLeft} />
 
         {/* Continut principal */}
         <main className="flex-1 overflow-auto">
