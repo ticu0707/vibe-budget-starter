@@ -18,6 +18,10 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Neautentificat" }, { status: 401 });
     }
 
+    if (user.user_metadata?.unlocked === true) {
+      return NextResponse.json({ error: "Codul a fost deja folosit pentru acest cont." }, { status: 409 });
+    }
+
     const { error } = await supabase.auth.updateUser({
       data: { unlocked: true },
     });

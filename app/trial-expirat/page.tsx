@@ -8,12 +8,12 @@ export default function TrialExpiratPage() {
   const router = useRouter();
   const [parola, setParola] = useState("");
   const [loading, setLoading] = useState(false);
-  const [eroare, setEroare] = useState(false);
+  const [eroare, setEroare] = useState<string | null>(null);
 
   async function handleUnlock(e: React.FormEvent) {
     e.preventDefault();
     setLoading(true);
-    setEroare(false);
+    setEroare(null);
 
     try {
       const res = await fetch("/api/unlock", {
@@ -23,7 +23,8 @@ export default function TrialExpiratPage() {
       });
 
       if (!res.ok) {
-        setEroare(true);
+        const data = await res.json();
+        setEroare(data.error ?? "Cod incorect. Încearcă din nou.");
         setParola("");
         return;
       }
@@ -31,7 +32,7 @@ export default function TrialExpiratPage() {
       router.push("/dashboard");
       router.refresh();
     } catch {
-      setEroare(true);
+      setEroare("Eroare de rețea. Încearcă din nou.");
     } finally {
       setLoading(false);
     }
@@ -64,7 +65,7 @@ export default function TrialExpiratPage() {
                 type="text"
                 required
                 value={parola}
-                onChange={(e) => { setParola(e.target.value); setEroare(false); }}
+                onChange={(e) => { setParola(e.target.value); setEroare(null); }}
                 placeholder="Introdu codul primit"
                 autoFocus
                 className={`w-full bg-white/10 border rounded-xl px-4 py-3 text-white placeholder-white/30 focus:outline-none transition-all ${
@@ -74,7 +75,7 @@ export default function TrialExpiratPage() {
                 }`}
               />
               {eroare && (
-                <p className="text-red-400 text-sm mt-2">Cod incorect. Încearcă din nou.</p>
+                <p className="text-red-400 text-sm mt-2">{eroare}</p>
               )}
             </div>
 
