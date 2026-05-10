@@ -20,7 +20,8 @@ export default async function DashboardLayout({
 
   const daysSince = (Date.now() - new Date(user.created_at).getTime()) / (1000 * 60 * 60 * 24);
   const isUnlocked = user.user_metadata?.unlocked === true;
-  const trialExpired = daysSince > TRIAL_DAYS && !isUnlocked;
+  const isDev = process.env.NODE_ENV === "development";
+  const trialExpired = daysSince > TRIAL_DAYS && !isUnlocked && !isDev;
 
   if (trialExpired) {
     redirect("/trial-expirat");

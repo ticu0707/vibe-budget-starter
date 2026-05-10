@@ -389,18 +389,26 @@ export default function TransactionsClient({
           )}
 
           {/* Date range */}
-          <input
-            type="date"
-            value={filters.dateFrom}
-            onChange={(e) => setFilters({ ...filters, dateFrom: e.target.value })}
-            className="bg-white/60 border border-teal-200 rounded-xl px-3 py-2.5 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-teal-400"
-          />
-          <input
-            type="date"
-            value={filters.dateTo}
-            onChange={(e) => setFilters({ ...filters, dateTo: e.target.value })}
-            className="bg-white/60 border border-teal-200 rounded-xl px-3 py-2.5 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-teal-400"
-          />
+          <div className="flex items-center gap-1 bg-white/60 border border-teal-200 rounded-xl px-3 py-2.5">
+            <span className="text-xs text-gray-400 whitespace-nowrap">De la</span>
+            <input
+              type="date"
+              title="Dată început"
+              value={filters.dateFrom}
+              onChange={(e) => setFilters({ ...filters, dateFrom: e.target.value })}
+              className="text-sm text-gray-700 bg-transparent focus:outline-none"
+            />
+          </div>
+          <div className="flex items-center gap-1 bg-white/60 border border-teal-200 rounded-xl px-3 py-2.5">
+            <span className="text-xs text-gray-400 whitespace-nowrap">Până la</span>
+            <input
+              type="date"
+              title="Dată sfârșit"
+              value={filters.dateTo}
+              onChange={(e) => setFilters({ ...filters, dateTo: e.target.value })}
+              className="text-sm text-gray-700 bg-transparent focus:outline-none"
+            />
+          </div>
 
           {/* Reset */}
           {hasFilters && (

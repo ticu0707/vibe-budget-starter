@@ -1,16 +1,7 @@
-/**
- * MIDDLEWARE - Supabase Auth Session Refresh
- *
- * SCOP:
- * 1. Refresh automat session cookies pentru utilizatori autentificați
- * 2. Protejează rute care necesită autentificare
- * 3. Redirect utilizatori ne-autentificați la /login
- */
-
 import { createServerClient } from '@supabase/ssr';
 import { NextResponse, type NextRequest } from 'next/server';
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   let supabaseResponse = NextResponse.next({
     request,
   });
@@ -36,25 +27,21 @@ export async function middleware(request: NextRequest) {
     }
   );
 
-  // Refresh session dacă există
   const {
     data: { user },
   } = await supabase.auth.getUser();
 
-  // Protejează rute care necesită autentificare
   const protectedPaths = ['/dashboard', '/transactions', '/categories', '/banks'];
   const isProtectedPath = protectedPaths.some((path) =>
     request.nextUrl.pathname.startsWith(path)
   );
 
   if (isProtectedPath && !user) {
-    // User ne-autentificat încearcă să acceseze o rută protejată
     const url = request.nextUrl.clone();
     url.pathname = '/login';
     return NextResponse.redirect(url);
   }
 
-  // User autentificat încearcă să acceseze /login sau /register
   if (user && (request.nextUrl.pathname === '/login' || request.nextUrl.pathname === '/register')) {
     const url = request.nextUrl.clone();
     url.pathname = '/dashboard';
@@ -66,13 +53,6 @@ export async function middleware(request: NextRequest) {
 
 export const config = {
   matcher: [
-    /*
-     * Match toate rutele EXCEPT:
-     * - _next/static (static files)
-     * - _next/image (image optimization files)
-     * - favicon.ico (favicon file)
-     * - public files (*.svg, *.png, etc.)
-     */
     '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
   ],
 };

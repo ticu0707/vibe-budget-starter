@@ -170,17 +170,37 @@ export default function UploadPage() {
         {/* Dropdown bancă */}
         <div>
           <label className="block text-sm font-semibold text-gray-700 mb-2">Bancă sursă</label>
-          <select
-            value={bankId}
-            onChange={(e) => setBankId(e.target.value)}
-            className="w-full bg-white/60 border border-teal-200 rounded-xl px-4 py-3 text-gray-700 focus:outline-none focus:ring-2 focus:ring-teal-400"
-          >
-            <option value="">— Selectează banca —</option>
-            {banks.map((b) => (
-              <option key={b.id} value={b.id}>{b.name}</option>
-            ))}
-          </select>
-          <p className="text-xs text-gray-400 mt-1">Adaugă bănci din pagina <a href="/dashboard/banks" className="text-teal-600 underline">Bănci</a>.</p>
+          {banks.length === 0 ? (
+            <div className="bg-orange-50 border border-orange-200 rounded-xl px-4 py-4 flex items-start gap-3">
+              <span className="text-orange-500 text-xl mt-0.5">⚠️</span>
+              <div>
+                <p className="text-sm font-semibold text-orange-800">Nu ai nicio bancă adăugată</p>
+                <p className="text-xs text-orange-600 mt-1">
+                  Trebuie să adaugi cel puțin o bancă înainte de a importa tranzacții.
+                </p>
+                <a
+                  href="/dashboard/banks"
+                  className="inline-block mt-2 bg-orange-500 hover:bg-orange-600 text-white text-xs font-semibold rounded-lg px-3 py-1.5 transition-colors"
+                >
+                  + Adaugă o bancă acum
+                </a>
+              </div>
+            </div>
+          ) : (
+            <>
+              <select
+                value={bankId}
+                onChange={(e) => setBankId(e.target.value)}
+                className="w-full bg-white/60 border border-teal-200 rounded-xl px-4 py-3 text-gray-700 focus:outline-none focus:ring-2 focus:ring-teal-400"
+              >
+                <option value="">— Selectează banca —</option>
+                {banks.map((b) => (
+                  <option key={b.id} value={b.id}>{b.name}</option>
+                ))}
+              </select>
+              <p className="text-xs text-gray-400 mt-1">Adaugă bănci din pagina <a href="/dashboard/banks" className="text-teal-600 underline">Bănci</a>.</p>
+            </>
+          )}
         </div>
 
         {/* Eroare import */}
