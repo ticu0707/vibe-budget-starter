@@ -139,6 +139,6 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     const msg = error instanceof Error ? error.message : String(error);
     console.error("[AI-COACH] Error:", msg);
-    return NextResponse.json({ error: msg }, { status: 500 });
+    return NextResponse.json({ error: "Eroare la generarea sfatului financiar" }, { status: 500 });
   }
 }

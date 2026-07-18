@@ -3,6 +3,7 @@ import { getCurrentUser } from "@/lib/auth/get-current-user";
 import { db } from "@/lib/db";
 import * as schema from "@/lib/db/schema";
 import { and, eq } from "drizzle-orm";
+import { verifyCategoryOwnership } from "@/lib/db/verify-ownership";
 
 export async function POST(request: NextRequest) {
   try {
@@ -15,6 +16,10 @@ export async function POST(request: NextRequest) {
 
     if (!keyword?.trim() || !categoryId) {
       return NextResponse.json({ error: "Keyword și categoryId sunt obligatorii" }, { status: 400 });
+    }
+
+    if (!(await verifyCategoryOwnership(categoryId, user.id))) {
+      return NextResponse.json({ error: "Categorie invalidă" }, { status: 400 });
     }
 
     const cleanKeyword = keyword.trim().toLowerCase();

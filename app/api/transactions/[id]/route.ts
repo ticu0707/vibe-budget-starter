@@ -3,6 +3,7 @@ import { getCurrentUser } from "@/lib/auth/get-current-user";
 import { db } from "@/lib/db";
 import * as schema from "@/lib/db/schema";
 import { and, eq } from "drizzle-orm";
+import { verifyCategoryOwnership, verifyBankOwnership } from "@/lib/db/verify-ownership";
 
 export async function PUT(
   request: NextRequest,
@@ -22,6 +23,13 @@ export async function PUT(
         { error: "Data, descriere, sumă și valută sunt obligatorii" },
         { status: 400 }
       );
+    }
+
+    if (categoryId && !(await verifyCategoryOwnership(categoryId, user.id))) {
+      return NextResponse.json({ error: "Categorie invalidă" }, { status: 400 });
+    }
+    if (bankId && !(await verifyBankOwnership(bankId, user.id))) {
+      return NextResponse.json({ error: "Bancă invalidă" }, { status: 400 });
     }
 
     const [transaction] = await db
@@ -66,6 +74,10 @@ export async function PATCH(
 
     const { id } = await params;
     const { categoryId } = await request.json();
+
+    if (categoryId && !(await verifyCategoryOwnership(categoryId, user.id))) {
+      return NextResponse.json({ error: "Categorie invalidă" }, { status: 400 });
+    }
 
     const [transaction] = await db
       .update(schema.transactions)
