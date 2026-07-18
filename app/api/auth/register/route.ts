@@ -20,6 +20,7 @@ export async function POST(request: NextRequest) {
     const { data, error } = await supabase.auth.signUp({ email, password });
 
     if (error) {
+      console.error("[REGISTER] Supabase auth error:", error.message);
       const msg = error.message ?? "";
       let friendly = "Eroare la înregistrare. Încearcă din nou.";
       if (msg.includes("already registered") || msg.includes("already exists")) {

@@ -17,6 +17,7 @@ export async function POST(request: NextRequest) {
     const { data, error } = await supabase.auth.signInWithPassword({ email, password });
 
     if (error) {
+      console.error("[LOGIN] Supabase auth error:", error.message);
       return NextResponse.json({ error: "Email sau parolă incorectă" }, { status: 401 });
     }
 
